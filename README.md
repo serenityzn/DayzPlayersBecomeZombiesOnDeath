@@ -7,7 +7,8 @@ The DAyz Server mod enhances the survival experience by adding a unique twist to
 
 Upon a player's death, a zombie is spawned in their place.
 This zombie inherits all the loot and equipment the player had at the time of death.
-Loot Retrieval Challenge:
+
+### Loot Retrieval Challenge:
 
 Players must confront and defeat the zombie to reclaim their items.
 Adds a new layer of risk and reward, as players must balance the danger of fighting the zombie against the value of their lost loot.
