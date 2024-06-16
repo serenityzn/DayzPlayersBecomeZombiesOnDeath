@@ -1,4 +1,4 @@
-# DAyz Server Mod: Zombie Respawn with Player Loot
+# DayZ Server Mod: Zombie Respawn with Player Loot
 ### Overview:
 The DAyz Server mod enhances the survival experience by adding a unique twist to player deaths. When a player dies, a zombie is spawned at the location of their demise, carrying all the loot the player had at the time of death. This mod introduces new strategic elements to gameplay, encouraging players to think carefully about their actions and providing an additional challenge for those who dare to retrieve their lost gear.
 
