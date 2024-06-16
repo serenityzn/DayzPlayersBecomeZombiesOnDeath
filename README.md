@@ -21,7 +21,7 @@ Introduces unpredictability, as other players might also encounter and engage th
 
 ### Customizable Settings:
 
-Server administrators can adjust the difficulty and behavior of the spawned zombie.
+Server administrators can adjust the difficulty and behavior of the spawned zombie, including the delay after which a player becomes a zombie.
 Options to tweak loot drop mechanics and zombie attributes to suit different playstyles.
 
 ### Enhanced Immersion:
