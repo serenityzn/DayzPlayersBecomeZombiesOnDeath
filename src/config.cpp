@@ -39,7 +39,10 @@ class CfgMods
 			class worldScriptModule
 			{
 				value = "";
-				files[] = { "PlayersBecameZombiesOnDeath/4_World" };
+				files[] = {
+					"PlayersBecameZombiesOnDeath/4_World",
+					"PlayersBecameZombiesOnDeath/4_World/Entities/Infected"
+				};
 			};
 		};
 	};
@@ -122,36 +125,21 @@ class CfgAIBehaviours
 
 class CfgVehicles
 {
-	class Clothing;
-	class hikingjacket_colorbase;
-	class LTS_Admin_JAcket: hikingjacket_colorbase
-	{
-		displayName="Admin Jacket";
-		descriptionShort="Admin JAcket";
-		scope=2;
-		itemsCargoSize[]={10,15};
-		inventorySlot[]={
-			"Body"
-		};
-		attachments[]=
-		{
-			"WalkieTalkie"
-		};
-		itemSize[]={3,3};
-		hiddenSelectionsTextures[]=
-		{
-			"\dz\characters\tops\data\PCU5Jacket_ground_black_co.paa",
-			"\dz\characters\tops\data\PCU5Jacket_black_co.paa",
-			"\dz\characters\tops\data\PCU5Jacket_black_co.paa"
-		};
-		
-	};
 	class DZ_LightAI;
 	class DayZInfected;
 	class ZombieBase;
 	class ZombieFemaleBase;
+	class ZombieMaleBase;
+	class LowTierMaleZombieBase;
+
 	class ZmbF_DoctorSkinny_Base;
-	class ZmbF_Linda: ZmbF_DoctorSkinny_Base
+	class ZmbF_CitizenANormal_Base;
+	class ZmbF_CitizenANormal_Blue;
+	class ZmbM_CitizenASkinny_LT_Base;
+	class ZmbM_CitizenASkinny_Brown;
+
+	// Player zombie - female Linda skin
+	class PBZ_Zombie_Linda: ZmbF_DoctorSkinny_Base
 	{
 		htMin = 126000;
 		htMax = 128800;
@@ -160,7 +148,6 @@ class CfgVehicles
 		mFact = 12333;
 		tBody = 12573;
 		aiAgentTemplate = "Custom_Zombie";
-
 		scope=2;
 		hiddenSelectionsMaterials[]=
 		{
@@ -171,14 +158,16 @@ class CfgVehicles
 			"PlayersBecameZombiesOnDeath\data\linda_zombie_co.paa"
 		};
 		storageCategory=9;
-
 		hiddenSelections[]=
 		{
 			"camo"
 		};
-		
 		attachments[]=
 		{
+			"Body",
+			"Legs",
+			"Feet",
+			"Hands",
 			"Vest",
 			"Back",
 			"Headgear",
@@ -195,6 +184,10 @@ class CfgVehicles
 		{
 			playerSlots[]=
 			{
+				"Slot_Body",
+				"Slot_Legs",
+				"Slot_Feet",
+				"Slot_Hands",
 				"Slot_Vest",
 				"Slot_Back",
 				"Slot_Headgear",
@@ -205,9 +198,8 @@ class CfgVehicles
 		};
 	};
 
-	class ZmbF_CitizenANormal_Base;
-	class ZmbF_CitizenANormal_Blue;
-	class ZmbF_Baty: ZmbF_CitizenANormal_Blue
+	// Player zombie - female Baty skin
+	class PBZ_Zombie_Baty: ZmbF_CitizenANormal_Blue
 	{
 		htMin = 126000;
 		htMax = 128800;
@@ -226,14 +218,16 @@ class CfgVehicles
 			"PlayersBecameZombiesOnDeath\data\baty_zombie_co.paa"
 		};
 		storageCategory=9;
-
 		hiddenSelections[]=
 		{
 			"camo"
 		};
-		
 		attachments[]=
 		{
+			"Body",
+			"Legs",
+			"Feet",
+			"Hands",
 			"Vest",
 			"Back",
 			"Headgear",
@@ -250,6 +244,10 @@ class CfgVehicles
 		{
 			playerSlots[]=
 			{
+				"Slot_Body",
+				"Slot_Legs",
+				"Slot_Feet",
+				"Slot_Hands",
 				"Slot_Vest",
 				"Slot_Back",
 				"Slot_Headgear",
@@ -260,11 +258,8 @@ class CfgVehicles
 		};
 	};
 
-	class ZombieMaleBase;
-	class LowTierMaleZombieBase;
-	class ZmbM_CitizenASkinny_LT_Base;
-	class ZmbM_CitizenASkinny_Brown;
-	class ZmbF_Frida: ZmbM_CitizenASkinny_Brown 
+	// Player zombie - female Frida skin (default female)
+	class PBZ_Zombie_Female: ZmbF_CitizenANormal_Blue
 	{
 		htMin = 126000;
 		htMax = 128800;
@@ -283,14 +278,16 @@ class CfgVehicles
 			"PlayersBecameZombiesOnDeath\data\frida_zombie_co.paa"
 		};
 		storageCategory=9;
-
 		hiddenSelections[]=
 		{
 			"camo"
 		};
-		
 		attachments[]=
 		{
+			"Body",
+			"Legs",
+			"Feet",
+			"Hands",
 			"Vest",
 			"Back",
 			"Headgear",
@@ -307,6 +304,10 @@ class CfgVehicles
 		{
 			playerSlots[]=
 			{
+				"Slot_Body",
+				"Slot_Legs",
+				"Slot_Feet",
+				"Slot_Hands",
 				"Slot_Vest",
 				"Slot_Back",
 				"Slot_Headgear",
@@ -315,7 +316,53 @@ class CfgVehicles
 				"Slot_Armband"
 			};
 		};
-
 	};
-	
+
+	// Player zombie - male skin (default male)
+	class PBZ_Zombie_Male: ZmbM_CitizenASkinny_Brown
+	{
+		htMin = 126000;
+		htMax = 128800;
+		afMax = 12400;
+		mfMax = 12333;
+		mFact = 12333;
+		tBody = 12573;
+		aiAgentTemplate = "Custom_Zombie";
+		scope=2;
+		storageCategory=9;
+		attachments[]=
+		{
+			"Body",
+			"Legs",
+			"Feet",
+			"Hands",
+			"Vest",
+			"Back",
+			"Headgear",
+			"Eyewear",
+			"Mask"
+		};
+		class Cargo
+		{
+			itemsCargoSize[]={10,20};
+			allowOwnedCargoManipulation=1;
+			openable=0;
+		};
+		class InventoryEquipment
+		{
+			playerSlots[]=
+			{
+				"Slot_Body",
+				"Slot_Legs",
+				"Slot_Feet",
+				"Slot_Hands",
+				"Slot_Vest",
+				"Slot_Back",
+				"Slot_Headgear",
+				"Slot_Eyewear",
+				"Slot_Mask",
+				"Slot_Armband"
+			};
+		};
+	};
 };
