@@ -63,10 +63,16 @@ modded class PlayerBase
 			if (batchSize > oldCount) batchSize = oldCount;
 
 			int deleted = 0;
-			for (int fi = 0; fi < oldFem.Count() && deleted < batchSize; fi++, deleted++)
+			for (int fi = 0; fi < oldFem.Count() && deleted < batchSize; fi++)
+			{
 				GetGame().ObjectDelete(oldFem[fi]);
-			for (int mi = 0; mi < oldMal.Count() && deleted < batchSize; mi++, deleted++)
+				deleted++;
+			}
+			for (int mi = 0; mi < oldMal.Count() && deleted < batchSize; mi++)
+			{
 				GetGame().ObjectDelete(oldMal[mi]);
+				deleted++;
+			}
 
 			if (cfg.DebugEnabled)
 				Print("[PBZ] Cap cleanup: deleted " + deleted + " old zombie(s). Total was: " + (femCount + malCount));
@@ -200,7 +206,7 @@ modded class PlayerBase
 				string pid = zF.GetTargetPlayerID();
 				int idx = pids.Find(pid);
 				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zF.IsChasing() ? 1 : 0); }
-				else { counts[idx]++; if (zF.IsChasing()) chasing[idx]++; }
+				else { counts[idx] = counts[idx] + 1; if (zF.IsChasing()) chasing[idx] = chasing[idx] + 1; }
 			}
 		}
 		if (PBZ_Zombie_Male.s_Instances)
@@ -211,7 +217,7 @@ modded class PlayerBase
 				string pid = zM.GetTargetPlayerID();
 				int idx = pids.Find(pid);
 				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zM.IsChasing() ? 1 : 0); }
-				else { counts[idx]++; if (zM.IsChasing()) chasing[idx]++; }
+				else { counts[idx] = counts[idx] + 1; if (zM.IsChasing()) chasing[idx] = chasing[idx] + 1; }
 			}
 		}
 
