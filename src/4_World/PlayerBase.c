@@ -29,24 +29,54 @@ modded class PlayerBase
 		}
 	}
 
-	private void PBZ_LogRegistryStatus()
+	string PBZ_GetZombiePID(EntityAI z)
+	{
+		PBZ_Zombie_Female zF = PBZ_Zombie_Female.Cast(z);
+		if (zF) return zF.GetTargetPlayerID();
+		PBZ_Zombie_Male zM = PBZ_Zombie_Male.Cast(z);
+		if (zM) return zM.GetTargetPlayerID();
+		return "";
+	}
+
+	void PBZ_DeleteZombie(EntityAI z)
+	{
+		PBZ_Zombie_Female zF = PBZ_Zombie_Female.Cast(z);
+		if (zF) zF.ClearTargetPlayerID();
+		PBZ_Zombie_Male zM = PBZ_Zombie_Male.Cast(z);
+		if (zM) zM.ClearTargetPlayerID();
+		PBZ_Config.UnregisterZombie(z);
+		GetGame().ObjectDelete(z);
+	}
+
+	void PBZ_LogRegistryStatus()
 	{
 		array<EntityAI> reg = PBZ_Config.GetZombieRegistry();
 		if (!reg) return;
 
 		int total = reg.Count();
 		int activeTracking = 0;
+		int perPlayerCount = 0;
 
-		map<string, int> perPlayer = new map<string, int>();
+		// Use parallel arrays instead of map<string,int> for compatibility
+		array<string> playerIDs   = new array<string>();
+		array<int>    playerCounts = new array<int>();
 
 		foreach (EntityAI ze : reg)
 		{
 			string pid = PBZ_GetZombiePID(ze);
 			if (pid == "") continue;
 
-			perPlayer.Set(pid, perPlayer.Get(pid) + 1);
+			int idx = playerIDs.Find(pid);
+			if (idx == -1)
+			{
+				playerIDs.Insert(pid);
+				playerCounts.Insert(1);
+			}
+			else
+			{
+				playerCounts[idx] = playerCounts[idx] + 1;
+			}
 
-			// Count as "actively following" if it has a target and is not already in aggro
 			ZombieBase zb = ZombieBase.Cast(ze);
 			if (zb)
 			{
@@ -61,31 +91,11 @@ modded class PlayerBase
 		Print("[PBZ]   Following (noise) : " + activeTracking);
 		Print("[PBZ]   In aggro (vanilla) : " + (total - activeTracking));
 		Print("[PBZ]   Per player:");
-		for (int pi = 0; pi < perPlayer.Count(); pi++)
+		for (int pi = 0; pi < playerIDs.Count(); pi++)
 		{
-			string ppid = perPlayer.GetKeyByIndex(pi);
-			Print("[PBZ]     " + ppid + " : " + perPlayer.Get(ppid) + " zombie(s)");
+			Print("[PBZ]     " + playerIDs[pi] + " : " + playerCounts[pi] + " zombie(s)");
 		}
 		Print("[PBZ] ========================");
-	}
-
-	private string PBZ_GetZombiePID(EntityAI z)
-	{
-		PBZ_Zombie_Female zF = PBZ_Zombie_Female.Cast(z);
-		if (zF) return zF.GetTargetPlayerID();
-		PBZ_Zombie_Male zM = PBZ_Zombie_Male.Cast(z);
-		if (zM) return zM.GetTargetPlayerID();
-		return "";
-	}
-
-	private void PBZ_DeleteZombie(EntityAI z)
-	{
-		PBZ_Zombie_Female zF = PBZ_Zombie_Female.Cast(z);
-		if (zF) zF.ClearTargetPlayerID();
-		PBZ_Zombie_Male zM = PBZ_Zombie_Male.Cast(z);
-		if (zM) zM.ClearTargetPlayerID();
-		PBZ_Config.UnregisterZombie(z);
-		GetGame().ObjectDelete(z);
 	}
 
 	void SpawnZombie(vector pos, GameInventory playerInventory, string playerID)
@@ -109,11 +119,16 @@ modded class PlayerBase
 			PBZ_Config cfg = PBZ_Config.GetInstance();
 
 			// Find the latest registry index for each player (highest index = most recent zombie)
-			map<string, int> latestIdxPerPlayer = new map<string, int>();
+			// Using parallel arrays instead of map<string,int> for compatibility
+			array<string> latestPIDs = new array<string>();
+			array<int>    latestIdxs = new array<int>();
 			for (int li = 0; li < registry.Count(); li++)
 			{
 				string lpid = PBZ_GetZombiePID(registry[li]);
-				if (lpid != "") latestIdxPerPlayer.Set(lpid, li);
+				if (lpid == "") continue;
+				int existIdx = latestPIDs.Find(lpid);
+				if (existIdx == -1) { latestPIDs.Insert(lpid); latestIdxs.Insert(li); }
+				else latestIdxs[existIdx] = li;
 			}
 
 			// Collect "old" zombies — all but the most recent one per player, oldest first
@@ -121,7 +136,9 @@ modded class PlayerBase
 			for (int oi = 0; oi < registry.Count(); oi++)
 			{
 				string opid = PBZ_GetZombiePID(registry[oi]);
-				if (opid != "" && latestIdxPerPlayer.Get(opid) != oi)
+				if (opid == "") continue;
+				int pidIdx = latestPIDs.Find(opid);
+				if (pidIdx != -1 && latestIdxs[pidIdx] != oi)
 					oldZombies.Insert(registry[oi]);
 			}
 
