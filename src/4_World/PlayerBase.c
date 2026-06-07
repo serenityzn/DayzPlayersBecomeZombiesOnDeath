@@ -45,10 +45,9 @@ modded class PlayerBase
 		if ( !zombie )
 			return;
 
-		// Make the player zombie stronger — double health, instant aggro
+		// Make the player zombie stronger — double health
 		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * 2);
 		zombie.SetHealth("Blood", "", zombie.GetMaxHealth("Blood", ""));
-		zombie.SetAIAgentTypeByName("ZombieEnraged");
 
 		int count = playerInventory.AttachmentCount();
 		int cargoCount;
