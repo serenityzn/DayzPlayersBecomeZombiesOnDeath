@@ -9,9 +9,10 @@ modded class PlayerBase
 		// Extra damage when hit by a player zombie
 		if ( source && ( source.GetType() == "PBZ_Zombie_Female" || source.GetType() == "PBZ_Zombie_Male" ) )
 		{
-			AddHealth("", "Health", -15);
-			AddHealth("", "Blood", -30);
-			AddHealth("", "Shock", -10);
+			PBZ_Config cfg = PBZ_Config.GetInstance();
+			AddHealth("", "Health", -cfg.ExtraDamageHealth);
+			AddHealth("", "Blood",  -cfg.ExtraDamageBlood);
+			AddHealth("", "Shock",  -cfg.ExtraDamageShock);
 		}
 
 		if ( BecameZombie )
@@ -20,7 +21,7 @@ modded class PlayerBase
 		if ( GetHealth() <= 0 )
 		{
 			BecameZombie = true;
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( SpawnZombie, 5000, false, GetPosition(), GetInventory() );
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( SpawnZombie, PBZ_Config.GetInstance().SpawnDelayMs, false, GetPosition(), GetInventory() );
 		}
 	}
 
@@ -45,8 +46,7 @@ modded class PlayerBase
 		if ( !zombie )
 			return;
 
-		// Make the player zombie stronger — double health
-		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * 2);
+		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * PBZ_Config.GetInstance().ZombieHealthMultiplier);
 
 		int count = playerInventory.AttachmentCount();
 		int cargoCount;
