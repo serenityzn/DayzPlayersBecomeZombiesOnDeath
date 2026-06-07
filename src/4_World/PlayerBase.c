@@ -63,7 +63,7 @@ modded class PlayerBase
 		Print("[PBZ]   Per player:");
 		for (int pi = 0; pi < perPlayer.Count(); pi++)
 		{
-			string ppid = perPlayer.GetKey(pi);
+			string ppid = perPlayer.GetKeyByIndex(pi);
 			Print("[PBZ]     " + ppid + " : " + perPlayer.Get(ppid) + " zombie(s)");
 		}
 		Print("[PBZ] ========================");
