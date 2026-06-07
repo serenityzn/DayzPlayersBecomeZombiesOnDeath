@@ -6,7 +6,7 @@ class PBZ_Zombie_Female : ZombieBase
 	void PBZ_Zombie_Female()
 	{
 		m_NoiseParams = new NoiseParams();
-		m_NoiseParams.LoadFromPath("cfgAmmo Ammo_762x39 NoiseHit");
+		m_NoiseParams.LoadFromPath("CfgVehicles SurvivorBase NoiseShout");
 	}
 
 	void SetTargetPlayerID(string id)
