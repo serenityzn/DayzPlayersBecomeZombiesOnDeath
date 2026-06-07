@@ -39,10 +39,7 @@ class CfgMods
 			class worldScriptModule
 			{
 				value = "";
-				files[] = {
-					"PlayersBecameZombiesOnDeath/4_World",
-					"PlayersBecameZombiesOnDeath/4_World/Entities/Infected"
-				};
+				files[] = { "PlayersBecameZombiesOnDeath/4_World" };
 			};
 		};
 	};
