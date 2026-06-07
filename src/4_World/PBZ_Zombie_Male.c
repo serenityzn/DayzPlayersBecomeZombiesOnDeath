@@ -2,14 +2,19 @@ class PBZ_Zombie_Male : ZombieBase
 {
 	private string m_TargetPlayerID;
 	private bool   m_IsChasing;
+	private int    m_ZombieID;
 	private ref NoiseParams m_NoiseParams;
 
 	static ref array<PBZ_Zombie_Male> s_Instances;
+	static int s_NextID;
 
 	void PBZ_Zombie_Male()
 	{
 		m_NoiseParams = new NoiseParams();
 		m_NoiseParams.LoadFromPath("CfgVehicles SurvivorBase NoiseShout");
+
+		m_ZombieID = s_NextID;
+		s_NextID++;
 
 		if (!s_Instances)
 			s_Instances = new array<PBZ_Zombie_Male>();
@@ -25,7 +30,11 @@ class PBZ_Zombie_Male : ZombieBase
 	{
 		m_IsChasing = chasing;
 		if (!m_IsChasing)
+		{
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
+			if (PBZ_Config.GetInstance().DebugEnabled)
+				Print("[PBZ][M#" + m_ZombieID + "] chasing STOPPED for player " + m_TargetPlayerID);
+		}
 	}
 
 	void SetTargetPlayerID(string id)
@@ -33,7 +42,11 @@ class PBZ_Zombie_Male : ZombieBase
 		m_TargetPlayerID = id;
 		m_IsChasing = true;
 		if (m_TargetPlayerID != "")
+		{
+			if (PBZ_Config.GetInstance().DebugEnabled)
+				Print("[PBZ][M#" + m_ZombieID + "] chasing STARTED for player " + m_TargetPlayerID);
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ScanForTarget, PBZ_Config.GetInstance().RescanIntervalMs, true);
+		}
 	}
 
 	void ScanForTarget()
@@ -76,18 +89,18 @@ class PBZ_Zombie_Male : ZombieBase
 
 			if (cfg.DebugEnabled)
 			{
-				Print("[PBZ] PBZ_Zombie_Male tracking player: " + m_TargetPlayerID);
-				Print("[PBZ]   Zombie pos : " + myPos.ToString());
-				Print("[PBZ]   Player pos : " + targetPos.ToString());
-				Print("[PBZ]   Distance   : " + dist.ToString() + " m");
-				Print("[PBZ]   Noise pos  : " + noisePos.ToString());
-				Print("[PBZ]   Lead dist  : " + leadDist.ToString() + " m");
+				Print("[PBZ][M#" + m_ZombieID + "] tracking player: " + m_TargetPlayerID);
+				Print("[PBZ][M#" + m_ZombieID + "]   Zombie pos : " + myPos.ToString());
+				Print("[PBZ][M#" + m_ZombieID + "]   Player pos : " + targetPos.ToString());
+				Print("[PBZ][M#" + m_ZombieID + "]   Distance   : " + dist.ToString() + " m");
+				Print("[PBZ][M#" + m_ZombieID + "]   Noise pos  : " + noisePos.ToString());
+				Print("[PBZ][M#" + m_ZombieID + "]   Lead dist  : " + leadDist.ToString() + " m");
 			}
 			return;
 		}
 
 		if (PBZ_Config.GetInstance().DebugEnabled)
-			Print("[PBZ] PBZ_Zombie_Male: target " + m_TargetPlayerID + " not found — roaming");
+			Print("[PBZ][M#" + m_ZombieID + "] target " + m_TargetPlayerID + " not found — roaming");
 	}
 
 	override void EEKilled(Object killer)
