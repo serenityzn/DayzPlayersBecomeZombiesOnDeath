@@ -51,18 +51,25 @@ class PBZ_Zombie_Male : ZombieBase
 
 			float lifetime = cfg.RescanIntervalMs / 1000.0 + 1.0;
 
-			// Place noise at lead point AND at player position for strong pull
-			GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 100.0);
-			GetGame().GetNoiseSystem().AddNoiseTarget(targetPos, lifetime, m_NoiseParams, 100.0);
+			// Only guide zombie via noise if not already chasing/fighting and outside aggro range
+			int mindState = GetMindStateSynced();
+			bool isChasing = (mindState == DayZInfectedConstants.MINDSTATE_CHASE || mindState == DayZInfectedConstants.MINDSTATE_FIGHT);
+
+			if (!isChasing && dist > 50)
+			{
+				GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 100.0);
+				GetGame().GetNoiseSystem().AddNoiseTarget(targetPos, lifetime, m_NoiseParams, 100.0);
+			}
 
 			if (cfg.DebugEnabled)
 			{
 				Print("[PBZ] PBZ_Zombie_Male tracking player: " + m_TargetPlayerID);
-				Print("[PBZ]   Zombie pos : " + myPos.ToString());
-				Print("[PBZ]   Player pos : " + targetPos.ToString());
-				Print("[PBZ]   Distance   : " + dist.ToString() + " m");
-				Print("[PBZ]   Noise pos  : " + noisePos.ToString());
-				Print("[PBZ]   Lead dist  : " + leadDist.ToString() + " m");
+				Print("[PBZ]   Zombie pos  : " + myPos.ToString());
+				Print("[PBZ]   Player pos  : " + targetPos.ToString());
+				Print("[PBZ]   Distance    : " + dist.ToString() + " m");
+				Print("[PBZ]   Mind state  : " + typename.EnumToString(DayZInfectedConstants, mindState));
+				Print("[PBZ]   Noise fired : " + (!isChasing && dist > 50).ToString());
+				Print("[PBZ]   Noise pos   : " + noisePos.ToString());
 			}
 			return;
 		}
