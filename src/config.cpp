@@ -41,6 +41,11 @@ class CfgMods
 				value = "";
 				files[] = { "PlayersBecameZombiesOnDeath/4_World" };
 			};
+			class missionScriptModule
+			{
+				value = "";
+				files[] = { "PlayersBecameZombiesOnDeath/5_Mission" };
+			};
 		};
 	};
 };
