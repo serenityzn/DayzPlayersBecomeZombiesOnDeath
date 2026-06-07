@@ -33,8 +33,10 @@ modded class PlayerBase
 	{
 		// Cap enforcement — runs only when total reaches MaxCustomZombies
 		PBZ_Config cfg = PBZ_Config.GetInstance();
-		int femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
-		int malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+		int femCount = 0;
+		int malCount = 0;
+		if (PBZ_Zombie_Female.s_Instances) femCount = PBZ_Zombie_Female.s_Instances.Count();
+		if (PBZ_Zombie_Male.s_Instances)   malCount = PBZ_Zombie_Male.s_Instances.Count();
 
 		if (femCount + malCount >= cfg.MaxCustomZombies)
 		{
@@ -77,21 +79,34 @@ modded class PlayerBase
 			if (cfg.DebugEnabled)
 				Print("[PBZ] Cap cleanup: deleted " + deleted + " old zombie(s). Total was: " + (femCount + malCount));
 
-			// Pass 2: still at cap — delete oldest overall (first in s_Instances = oldest)
-			femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
-			malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+			// Pass 2: still at cap — pre-calculate how many more to delete, collect then delete
+			int totalAfterPass1 = (femCount + malCount) - deleted;
+			int stillOver = totalAfterPass1 - cfg.MaxCustomZombies + 1;
 
-			while (femCount + malCount >= cfg.MaxCustomZombies)
+			if (stillOver > 0)
 			{
-				if (PBZ_Zombie_Female.s_Instances && PBZ_Zombie_Female.s_Instances.Count() > 0)
-					GetGame().ObjectDelete(PBZ_Zombie_Female.s_Instances[0]);
-				else if (PBZ_Zombie_Male.s_Instances && PBZ_Zombie_Male.s_Instances.Count() > 0)
-					GetGame().ObjectDelete(PBZ_Zombie_Male.s_Instances[0]);
-				else
-					break;
+				array<PBZ_Zombie_Female> toDeleteF2 = new array<PBZ_Zombie_Female>();
+				array<PBZ_Zombie_Male>   toDeleteM2 = new array<PBZ_Zombie_Male>();
 
-				femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
-				malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+				int fi2 = 0;
+				while (stillOver > 0 && PBZ_Zombie_Female.s_Instances && fi2 < PBZ_Zombie_Female.s_Instances.Count())
+				{
+					toDeleteF2.Insert(PBZ_Zombie_Female.s_Instances[fi2]);
+					fi2++;
+					stillOver--;
+				}
+				int mi2 = 0;
+				while (stillOver > 0 && PBZ_Zombie_Male.s_Instances && mi2 < PBZ_Zombie_Male.s_Instances.Count())
+				{
+					toDeleteM2.Insert(PBZ_Zombie_Male.s_Instances[mi2]);
+					mi2++;
+					stillOver--;
+				}
+
+				foreach (PBZ_Zombie_Female zFd : toDeleteF2)
+					GetGame().ObjectDelete(zFd);
+				foreach (PBZ_Zombie_Male zMd : toDeleteM2)
+					GetGame().ObjectDelete(zMd);
 			}
 		}
 
@@ -189,8 +204,10 @@ modded class PlayerBase
 
 	void PBZ_LogStatus()
 	{
-		int totalF = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
-		int totalM = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+		int totalF = 0;
+		int totalM = 0;
+		if (PBZ_Zombie_Female.s_Instances) totalF = PBZ_Zombie_Female.s_Instances.Count();
+		if (PBZ_Zombie_Male.s_Instances)   totalM = PBZ_Zombie_Male.s_Instances.Count();
 		int total  = totalF + totalM;
 
 		// Build per-player counts using parallel arrays
