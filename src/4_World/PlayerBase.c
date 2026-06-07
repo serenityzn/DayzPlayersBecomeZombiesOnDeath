@@ -110,24 +110,24 @@ modded class PlayerBase
 			}
 		}
 
-		// Stop any existing zombie chasing this player
-		if (PBZ_Zombie_Female.s_Instances)
+	// Stop any existing zombie chasing this player
+	if (PBZ_Zombie_Female.s_Instances)
+	{
+		foreach (PBZ_Zombie_Female zFC : PBZ_Zombie_Female.s_Instances)
 		{
-			foreach (PBZ_Zombie_Female zF : PBZ_Zombie_Female.s_Instances)
-			{
-				if (zF && zF.GetTargetPlayerID() == playerID)
-					zF.SetChasing(false);
-			}
+			if (zFC && zFC.GetTargetPlayerID() == playerID)
+				zFC.SetChasing(false);
 		}
+	}
 
-		if (PBZ_Zombie_Male.s_Instances)
+	if (PBZ_Zombie_Male.s_Instances)
+	{
+		foreach (PBZ_Zombie_Male zMC : PBZ_Zombie_Male.s_Instances)
 		{
-			foreach (PBZ_Zombie_Male zM : PBZ_Zombie_Male.s_Instances)
-			{
-				if (zM && zM.GetTargetPlayerID() == playerID)
-					zM.SetChasing(false);
-			}
+			if (zMC && zMC.GetTargetPlayerID() == playerID)
+				zMC.SetChasing(false);
 		}
+	}
 
 		string ZombieSkin;
 		ZombieBase zombie;
@@ -239,23 +239,23 @@ modded class PlayerBase
 		}
 		if (PBZ_Zombie_Male.s_Instances)
 		{
-			foreach (PBZ_Zombie_Male zM : PBZ_Zombie_Male.s_Instances)
+			foreach (PBZ_Zombie_Male zML : PBZ_Zombie_Male.s_Instances)
 			{
-				if (!zM) continue;
-				string pid = zM.GetTargetPlayerID();
-				int idx = pids.Find(pid);
-				if (idx == -1)
+				if (!zML) continue;
+				string pidM = zML.GetTargetPlayerID();
+				int idxM = pids.Find(pidM);
+				if (idxM == -1)
 				{
-					pids.Insert(pid);
+					pids.Insert(pidM);
 					counts.Insert(1);
 					int chasingValM = 0;
-					if (zM.IsChasing()) chasingValM = 1;
+					if (zML.IsChasing()) chasingValM = 1;
 					chasing.Insert(chasingValM);
 				}
 				else
 				{
-					counts[idx] = counts[idx] + 1;
-					if (zM.IsChasing()) chasing[idx] = chasing[idx] + 1;
+					counts[idxM] = counts[idxM] + 1;
+					if (zML.IsChasing()) chasing[idxM] = chasing[idxM] + 1;
 				}
 			}
 		}
