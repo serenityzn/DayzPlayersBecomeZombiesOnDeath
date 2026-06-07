@@ -1,14 +1,19 @@
-class PBZ_ZombieBase: ZombieBase
+modded class PBZ_Zombie_Linda
 {
-	// Prevent the server's proximity-based despawn from removing this zombie.
-	// Does NOT affect death — killed zombies still go through normal death flow.
-	override bool CanBeDestroyed()
-	{
-		return false;
-	}
+	override bool CanBeDestroyed() { return false; }
 }
 
-class PBZ_Zombie_Linda: PBZ_ZombieBase {}
-class PBZ_Zombie_Baty: PBZ_ZombieBase {}
-class PBZ_Zombie_Female: PBZ_ZombieBase {}
-class PBZ_Zombie_Male: PBZ_ZombieBase {}
+modded class PBZ_Zombie_Baty
+{
+	override bool CanBeDestroyed() { return false; }
+}
+
+modded class PBZ_Zombie_Female
+{
+	override bool CanBeDestroyed() { return false; }
+}
+
+modded class PBZ_Zombie_Male
+{
+	override bool CanBeDestroyed() { return false; }
+}
