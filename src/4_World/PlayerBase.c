@@ -6,6 +6,14 @@ modded class PlayerBase
 	{
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
 
+		// Extra damage when hit by a player zombie
+		if ( source && ( source.GetType() == "ZmbF_HikerSkinny_Blue" || source.GetType() == "ZmbM_HikerSkinny_Brown" ) )
+		{
+			AddHealth("", "Health", -15);
+			AddHealth("", "Blood", -30);
+			AddHealth("", "Shock", -10);
+		}
+
 		if ( BecameZombie )
 			return;
 
@@ -22,21 +30,13 @@ modded class PlayerBase
 		ZombieBase zombie;
 		string playerType = GetType();
 
-		if ( playerType == "SurvivorF_Linda" )
+		if ( playerType.Contains("SurvivorF_") )
 		{
-			ZombieSkin = "PBZ_Zombie_Linda";
-		}
-		else if ( playerType == "SurvivorF_Baty" || playerType == "SurvivorF_Eva" )
-		{
-			ZombieSkin = "PBZ_Zombie_Baty";
-		}
-		else if ( playerType.Contains("SurvivorF_") )
-		{
-			ZombieSkin = "PBZ_Zombie_Female";
+			ZombieSkin = "ZmbF_HikerSkinny_Blue";
 		}
 		else
 		{
-			ZombieSkin = "PBZ_Zombie_Male";
+			ZombieSkin = "ZmbM_HikerSkinny_Brown";
 		}
 
 		Object zombieObject = GetGame().CreateObject(ZombieSkin, pos, false, true);
@@ -44,6 +44,11 @@ modded class PlayerBase
 
 		if ( !zombie )
 			return;
+
+		// Make the player zombie stronger — double health, instant aggro
+		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * 2);
+		zombie.SetHealth("Blood", "", zombie.GetMaxHealth("Blood", ""));
+		zombie.SetAIAgentTypeByName("ZombieEnraged");
 
 		int count = playerInventory.AttachmentCount();
 		int cargoCount;
@@ -54,6 +59,8 @@ modded class PlayerBase
 		for (int i = 0; i < count; i++)
 		{
 			p2Item = playerInventory.GetAttachmentFromIndex(i);
+			if ( !p2Item )
+				continue;
 			z2Item = zombie.GetInventory().CreateInInventory(p2Item.GetType());
 
 			if ( p2Item.HasAnyCargo() )
@@ -63,7 +70,8 @@ modded class PlayerBase
 				for (int j = 0; j < cargoCount; j++)
 				{
 					EntityAI myItem = p2Item.GetInventory().GetCargo().GetItem(j);
-					zombie.GetInventory().CreateInInventory(myItem.GetType());
+					if ( myItem )
+						zombie.GetInventory().CreateInInventory(myItem.GetType());
 				}
 			}
 
