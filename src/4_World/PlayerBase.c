@@ -7,7 +7,7 @@ modded class PlayerBase
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos, speedCoef);
 
 		// Extra damage when hit by a player zombie
-		if ( source && ( source.GetType() == "ZmbF_HikerSkinny_Blue" || source.GetType() == "ZmbM_HikerSkinny_Brown" ) )
+		if ( source && ( source.GetType() == "PBZ_Zombie_Female" || source.GetType() == "PBZ_Zombie_Male" ) )
 		{
 			AddHealth("", "Health", -15);
 			AddHealth("", "Blood", -30);
@@ -32,11 +32,11 @@ modded class PlayerBase
 
 		if ( playerType.Contains("SurvivorF_") )
 		{
-			ZombieSkin = "ZmbF_HikerSkinny_Blue";
+			ZombieSkin = "PBZ_Zombie_Female";
 		}
 		else
 		{
-			ZombieSkin = "ZmbM_HikerSkinny_Brown";
+			ZombieSkin = "PBZ_Zombie_Male";
 		}
 
 		Object zombieObject = GetGame().CreateObject(ZombieSkin, pos, false, true);
@@ -47,7 +47,6 @@ modded class PlayerBase
 
 		// Make the player zombie stronger — double health
 		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * 2);
-		zombie.SetHealth("Blood", "", zombie.GetMaxHealth("Blood", ""));
 
 		int count = playerInventory.AttachmentCount();
 		int cargoCount;
