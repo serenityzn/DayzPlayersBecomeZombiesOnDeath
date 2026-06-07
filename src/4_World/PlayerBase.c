@@ -31,6 +31,25 @@ modded class PlayerBase
 
 	void SpawnZombie(vector pos, GameInventory playerInventory, string playerID)
 	{
+		// Stop any existing zombie chasing this player
+		if (PBZ_Zombie_Female.s_Instances)
+		{
+			foreach (PBZ_Zombie_Female zF : PBZ_Zombie_Female.s_Instances)
+			{
+				if (zF && zF.GetTargetPlayerID() == playerID)
+					zF.SetChasing(false);
+			}
+		}
+
+		if (PBZ_Zombie_Male.s_Instances)
+		{
+			foreach (PBZ_Zombie_Male zM : PBZ_Zombie_Male.s_Instances)
+			{
+				if (zM && zM.GetTargetPlayerID() == playerID)
+					zM.SetChasing(false);
+			}
+		}
+
 		string ZombieSkin;
 		ZombieBase zombie;
 		string playerType = GetType();

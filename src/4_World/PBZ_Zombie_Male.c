@@ -1,24 +1,44 @@
 class PBZ_Zombie_Male : ZombieBase
 {
 	private string m_TargetPlayerID;
+	private bool   m_IsChasing;
 	private ref NoiseParams m_NoiseParams;
+
+	static ref array<PBZ_Zombie_Male> s_Instances;
 
 	void PBZ_Zombie_Male()
 	{
 		m_NoiseParams = new NoiseParams();
 		m_NoiseParams.LoadFromPath("CfgVehicles SurvivorBase NoiseShout");
+
+		if (!s_Instances)
+			s_Instances = new array<PBZ_Zombie_Male>();
+		s_Instances.Insert(this);
+	}
+
+	string GetTargetPlayerID()
+	{
+		return m_TargetPlayerID;
+	}
+
+	void SetChasing(bool chasing)
+	{
+		m_IsChasing = chasing;
+		if (!m_IsChasing)
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
 	}
 
 	void SetTargetPlayerID(string id)
 	{
 		m_TargetPlayerID = id;
+		m_IsChasing = true;
 		if (m_TargetPlayerID != "")
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ScanForTarget, PBZ_Config.GetInstance().RescanIntervalMs, true);
 	}
 
 	void ScanForTarget()
 	{
-		if (!IsAlive())
+		if (!IsAlive() || !m_IsChasing)
 		{
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
 			return;
@@ -51,7 +71,6 @@ class PBZ_Zombie_Male : ZombieBase
 
 			float lifetime = cfg.RescanIntervalMs / 1000.0 + 1.0;
 
-			// Place noise at lead point AND at player position for strong pull
 			GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 100.0);
 			GetGame().GetNoiseSystem().AddNoiseTarget(targetPos, lifetime, m_NoiseParams, 100.0);
 
@@ -75,5 +94,7 @@ class PBZ_Zombie_Male : ZombieBase
 	{
 		super.EEKilled(killer);
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
+		if (s_Instances)
+			s_Instances.RemoveItem(this);
 	}
 }
