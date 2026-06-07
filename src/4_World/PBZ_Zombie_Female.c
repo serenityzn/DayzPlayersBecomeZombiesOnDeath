@@ -67,7 +67,8 @@ class PBZ_Zombie_Female : ZombieBase
 				Print("[PBZ]   Zombie pos  : " + myPos.ToString());
 				Print("[PBZ]   Player pos  : " + targetPos.ToString());
 				Print("[PBZ]   Distance    : " + dist.ToString() + " m");
-				Print("[PBZ]   Mind state  : " + typename.EnumToString(DayZInfectedConstants, mindState));
+				Print("[PBZ]   Mind state  : " + mindState.ToString());
+				Print("[PBZ]   Is chasing  : " + isChasing.ToString());
 				Print("[PBZ]   Noise fired : " + (!isChasing && dist > 50).ToString());
 				Print("[PBZ]   Noise pos   : " + noisePos.ToString());
 			}
