@@ -19,6 +19,12 @@ class PBZ_Config
 	// How far ahead (meters) to place the noise waypoint toward the target player
 	float NoiseLeadDistance = 90.0;
 
+	// Maximum total PBZ zombies allowed on the server at once
+	int MaxCustomZombies = 20;
+
+	// How many old zombies to delete per cleanup pass when cap is reached (min 1)
+	int ZombieDeleteBatchSize = 2;
+
 	// Print debug info to server console and logs
 	bool DebugEnabled = false;
 

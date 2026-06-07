@@ -26,6 +26,11 @@ class PBZ_Zombie_Male : ZombieBase
 		return m_TargetPlayerID;
 	}
 
+	bool IsChasing()
+	{
+		return m_IsChasing;
+	}
+
 	void SetChasing(bool chasing)
 	{
 		m_IsChasing = chasing;
@@ -106,6 +111,14 @@ class PBZ_Zombie_Male : ZombieBase
 	override void EEKilled(Object killer)
 	{
 		super.EEKilled(killer);
+		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
+		if (s_Instances)
+			s_Instances.RemoveItem(this);
+	}
+
+	override void EEDelete(EntityAI parent)
+	{
+		super.EEDelete(parent);
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
 		if (s_Instances)
 			s_Instances.RemoveItem(this);

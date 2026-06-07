@@ -31,6 +31,64 @@ modded class PlayerBase
 
 	void SpawnZombie(vector pos, GameInventory playerInventory, string playerID)
 	{
+		// Cap enforcement — runs only when total reaches MaxCustomZombies
+		PBZ_Config cfg = PBZ_Config.GetInstance();
+		int femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
+		int malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+
+		if (femCount + malCount >= cfg.MaxCustomZombies)
+		{
+			// Collect old zombies (IsChasing == false) into temp arrays — never modify s_Instances during iteration
+			array<PBZ_Zombie_Female> oldFem = new array<PBZ_Zombie_Female>();
+			if (PBZ_Zombie_Female.s_Instances)
+			{
+				foreach (PBZ_Zombie_Female zF : PBZ_Zombie_Female.s_Instances)
+				{
+					if (zF && !zF.IsChasing()) oldFem.Insert(zF);
+				}
+			}
+			array<PBZ_Zombie_Male> oldMal = new array<PBZ_Zombie_Male>();
+			if (PBZ_Zombie_Male.s_Instances)
+			{
+				foreach (PBZ_Zombie_Male zM : PBZ_Zombie_Male.s_Instances)
+				{
+					if (zM && !zM.IsChasing()) oldMal.Insert(zM);
+				}
+			}
+
+			// Pass 1: delete a batch of old zombies (oldest females first, then males)
+			int oldCount = oldFem.Count() + oldMal.Count();
+			int batchSize = cfg.ZombieDeleteBatchSize;
+			if (batchSize < 1) batchSize = 1;
+			if (batchSize > oldCount) batchSize = oldCount;
+
+			int deleted = 0;
+			for (int fi = 0; fi < oldFem.Count() && deleted < batchSize; fi++, deleted++)
+				GetGame().ObjectDelete(oldFem[fi]);
+			for (int mi = 0; mi < oldMal.Count() && deleted < batchSize; mi++, deleted++)
+				GetGame().ObjectDelete(oldMal[mi]);
+
+			if (cfg.DebugEnabled)
+				Print("[PBZ] Cap cleanup: deleted " + deleted + " old zombie(s). Total was: " + (femCount + malCount));
+
+			// Pass 2: still at cap — delete oldest overall (first in s_Instances = oldest)
+			femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
+			malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+
+			while (femCount + malCount >= cfg.MaxCustomZombies)
+			{
+				if (PBZ_Zombie_Female.s_Instances && PBZ_Zombie_Female.s_Instances.Count() > 0)
+					GetGame().ObjectDelete(PBZ_Zombie_Female.s_Instances[0]);
+				else if (PBZ_Zombie_Male.s_Instances && PBZ_Zombie_Male.s_Instances.Count() > 0)
+					GetGame().ObjectDelete(PBZ_Zombie_Male.s_Instances[0]);
+				else
+					break;
+
+				femCount = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
+				malCount = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+			}
+		}
+
 		// Stop any existing zombie chasing this player
 		if (PBZ_Zombie_Female.s_Instances)
 		{
@@ -117,6 +175,50 @@ modded class PlayerBase
 			}
 		}
 
+		if (PBZ_Config.GetInstance().DebugEnabled)
+			PBZ_LogStatus();
+
 		Delete();
+	}
+
+	void PBZ_LogStatus()
+	{
+		int totalF = PBZ_Zombie_Female.s_Instances ? PBZ_Zombie_Female.s_Instances.Count() : 0;
+		int totalM = PBZ_Zombie_Male.s_Instances   ? PBZ_Zombie_Male.s_Instances.Count()   : 0;
+		int total  = totalF + totalM;
+
+		// Build per-player counts using parallel arrays
+		array<string> pids    = new array<string>();
+		array<int>    counts  = new array<int>();
+		array<int>    chasing = new array<int>();
+
+		if (PBZ_Zombie_Female.s_Instances)
+		{
+			foreach (PBZ_Zombie_Female zF : PBZ_Zombie_Female.s_Instances)
+			{
+				if (!zF) continue;
+				string pid = zF.GetTargetPlayerID();
+				int idx = pids.Find(pid);
+				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zF.IsChasing() ? 1 : 0); }
+				else { counts[idx]++; if (zF.IsChasing()) chasing[idx]++; }
+			}
+		}
+		if (PBZ_Zombie_Male.s_Instances)
+		{
+			foreach (PBZ_Zombie_Male zM : PBZ_Zombie_Male.s_Instances)
+			{
+				if (!zM) continue;
+				string pid = zM.GetTargetPlayerID();
+				int idx = pids.Find(pid);
+				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zM.IsChasing() ? 1 : 0); }
+				else { counts[idx]++; if (zM.IsChasing()) chasing[idx]++; }
+			}
+		}
+
+		Print("[PBZ] === Zombie Status ===");
+		Print("[PBZ]   Total : " + total + " / " + PBZ_Config.GetInstance().MaxCustomZombies + "  (F:" + totalF + " M:" + totalM + ")");
+		for (int i = 0; i < pids.Count(); i++)
+			Print("[PBZ]   Player " + pids[i] + " : " + counts[i] + " zombie(s), " + chasing[i] + " chasing");
+		Print("[PBZ] ======================");
 	}
 }
