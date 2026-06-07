@@ -222,8 +222,19 @@ modded class PlayerBase
 				if (!zF) continue;
 				string pid = zF.GetTargetPlayerID();
 				int idx = pids.Find(pid);
-				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zF.IsChasing() ? 1 : 0); }
-				else { counts[idx] = counts[idx] + 1; if (zF.IsChasing()) chasing[idx] = chasing[idx] + 1; }
+				if (idx == -1)
+				{
+					pids.Insert(pid);
+					counts.Insert(1);
+					int chasingValF = 0;
+					if (zF.IsChasing()) chasingValF = 1;
+					chasing.Insert(chasingValF);
+				}
+				else
+				{
+					counts[idx] = counts[idx] + 1;
+					if (zF.IsChasing()) chasing[idx] = chasing[idx] + 1;
+				}
 			}
 		}
 		if (PBZ_Zombie_Male.s_Instances)
@@ -233,8 +244,19 @@ modded class PlayerBase
 				if (!zM) continue;
 				string pid = zM.GetTargetPlayerID();
 				int idx = pids.Find(pid);
-				if (idx == -1) { pids.Insert(pid); counts.Insert(1); chasing.Insert(zM.IsChasing() ? 1 : 0); }
-				else { counts[idx] = counts[idx] + 1; if (zM.IsChasing()) chasing[idx] = chasing[idx] + 1; }
+				if (idx == -1)
+				{
+					pids.Insert(pid);
+					counts.Insert(1);
+					int chasingValM = 0;
+					if (zM.IsChasing()) chasingValM = 1;
+					chasing.Insert(chasingValM);
+				}
+				else
+				{
+					counts[idx] = counts[idx] + 1;
+					if (zM.IsChasing()) chasing[idx] = chasing[idx] + 1;
+				}
 			}
 		}
 
