@@ -6,12 +6,24 @@ class PBZ_Zombie_Male : ZombieBase
 	void PBZ_Zombie_Male()
 	{
 		m_NoiseParams = new NoiseParams();
-		m_NoiseParams.LoadFromPath("cfgAmmo Ammo_762x39 NoiseHit");
+		m_NoiseParams.LoadFromPath("CfgVehicles SurvivorBase NoiseShout");
+	}
+
+	string GetTargetPlayerID()
+	{
+		return m_TargetPlayerID;
+	}
+
+	void ClearTargetPlayerID()
+	{
+		m_TargetPlayerID = "";
+		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
 	}
 
 	void SetTargetPlayerID(string id)
 	{
 		m_TargetPlayerID = id;
+		PBZ_Config.RegisterZombie(this);
 		if (m_TargetPlayerID != "")
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ScanForTarget, PBZ_Config.GetInstance().RescanIntervalMs, true);
 	}
@@ -58,7 +70,6 @@ class PBZ_Zombie_Male : ZombieBase
 			if (!isChasing && dist > 50)
 			{
 				GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 100.0);
-				GetGame().GetNoiseSystem().AddNoiseTarget(targetPos, lifetime, m_NoiseParams, 100.0);
 			}
 
 			if (cfg.DebugEnabled)
@@ -67,7 +78,7 @@ class PBZ_Zombie_Male : ZombieBase
 				Print("[PBZ]   Zombie pos  : " + myPos.ToString());
 				Print("[PBZ]   Player pos  : " + targetPos.ToString());
 				Print("[PBZ]   Distance    : " + dist.ToString() + " m");
-				Print("[PBZ]   Mind state  : " + typename.EnumToString(DayZInfectedConstants, mindState));
+				Print("[PBZ]   Mind state  : " + mindState.ToString());
 				Print("[PBZ]   Noise fired : " + (!isChasing && dist > 50).ToString());
 				Print("[PBZ]   Noise pos   : " + noisePos.ToString());
 			}
@@ -82,5 +93,6 @@ class PBZ_Zombie_Male : ZombieBase
 	{
 		super.EEKilled(killer);
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(ScanForTarget);
+		PBZ_Config.UnregisterZombie(this);
 	}
 }

@@ -19,8 +19,36 @@ class PBZ_Config
 	// How far ahead (meters) to place the noise waypoint toward the target player
 	float NoiseLeadDistance = 90.0;
 
+	// Maximum number of PBZ zombies allowed at once across all players
+	int MaxCustomZombies = 20;
+
+	// How many old zombies to delete per cleanup pass when cap is reached
+	int ZombieDeleteBatchSize = 2;
+
 	// Print debug info to server console and logs
 	bool DebugEnabled = false;
+
+	// Registry of all active PBZ zombies for cross-death tracking management
+	static ref array<EntityAI> s_PBZZombies;
+
+	static void RegisterZombie(EntityAI zombie)
+	{
+		if (!s_PBZZombies)
+			s_PBZZombies = new array<EntityAI>();
+		if (s_PBZZombies.Find(zombie) == -1)
+			s_PBZZombies.Insert(zombie);
+	}
+
+	static void UnregisterZombie(EntityAI zombie)
+	{
+		if (s_PBZZombies)
+			s_PBZZombies.RemoveItem(zombie);
+	}
+
+	static array<EntityAI> GetZombieRegistry()
+	{
+		return s_PBZZombies;
+	}
 
 	static PBZ_Config GetInstance()
 	{
