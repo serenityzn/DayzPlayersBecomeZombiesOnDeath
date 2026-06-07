@@ -1,3 +1,26 @@
+class CfgAmmo
+{
+	class MeleeZombie;
+	class PBZ_MeleeZombie: MeleeZombie
+	{
+		class DamageApplied
+		{
+			class Health
+			{
+				damage = 25;
+			};
+			class Blood
+			{
+				damage = 50;
+			};
+			class Shock
+			{
+				damage = 15;
+			};
+		};
+	};
+};
+
 class CfgPatches
 {
 	class PlayersBecameZombiesOnDeath
@@ -79,18 +102,18 @@ class CfgAIBehaviours
 		{
 			class MovementWalk: MovementWalk
 			{
-				maxSpeed = 100.0;
-				minSpeed = 100.0;
+				maxSpeed = 1.5;
+				minSpeed = 1.0;
 			};
 			class MovementRun: MovementRun
 			{
-				maxSpeed = 150.0;
-				minSpeed = 150.0;
+				maxSpeed = 5.5;
+				minSpeed = 4.0;
 			};
 			class MovementSprint: MovementSprint
 			{
-				maxSpeed = 200.0;
-				minSpeed = 190.0;
+				maxSpeed = 7.0;
+				minSpeed = 6.0;
 			};
 			class SlotCalm: SlotCalm
 			{
@@ -102,7 +125,7 @@ class CfgAIBehaviours
 			};
 			class AlertSystem: AlertSystem
 			{
-				visionToAlertMultiplier = 40;
+				visionToAlertMultiplier = 10;
 				noiseToAlertMultiplier = 3.0;
 				damageToAlertMultiplier = 10000;
 				noiseShotToAlertMultiplier = 5.0;
@@ -124,7 +147,37 @@ class CfgVehicles
 {
 	class DZ_LightAI;
 	class DayZInfected;
-	class ZombieBase;
+	class ZombieBase
+	{
+		attachments[]=
+		{
+			"Body",
+			"Legs",
+			"Feet",
+			"Hands",
+			"Vest",
+			"Back",
+			"Headgear",
+			"Eyewear",
+			"Mask"
+		};
+		class InventoryEquipment
+		{
+			playerSlots[]=
+			{
+				"Slot_Body",
+				"Slot_Legs",
+				"Slot_Feet",
+				"Slot_Hands",
+				"Slot_Vest",
+				"Slot_Back",
+				"Slot_Headgear",
+				"Slot_Eyewear",
+				"Slot_Mask",
+				"Slot_Armband"
+			};
+		};
+	};
 	class ZombieFemaleBase;
 	class ZombieMaleBase;
 	class LowTierMaleZombieBase;
