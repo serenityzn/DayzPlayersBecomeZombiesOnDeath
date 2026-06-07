@@ -1,6 +1,7 @@
 modded class PlayerBase
 {
 	bool BecameZombie = false;
+	string m_PBZ_PlayerID = "";
 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos, float speedCoef)
 	{
@@ -21,11 +22,14 @@ modded class PlayerBase
 		if ( GetHealth() <= 0 )
 		{
 			BecameZombie = true;
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( SpawnZombie, PBZ_Config.GetInstance().SpawnDelayMs, false, GetPosition(), GetInventory() );
+			PlayerIdentity identity = GetIdentity();
+			if (identity)
+				m_PBZ_PlayerID = identity.GetId();
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( SpawnZombie, PBZ_Config.GetInstance().SpawnDelayMs, false, GetPosition(), GetInventory(), m_PBZ_PlayerID );
 		}
 	}
 
-	void SpawnZombie(vector pos, GameInventory playerInventory)
+	void SpawnZombie(vector pos, GameInventory playerInventory, string playerID)
 	{
 		string ZombieSkin;
 		ZombieBase zombie;
@@ -47,6 +51,18 @@ modded class PlayerBase
 			return;
 
 		zombie.SetHealth("", "", zombie.GetMaxHealth("", "") * PBZ_Config.GetInstance().ZombieHealthMultiplier);
+
+		// Pass the dead player's ID so the zombie hunts them when they respawn
+		if (ZombieSkin == "PBZ_Zombie_Female")
+		{
+			PBZ_Zombie_Female pbzF = PBZ_Zombie_Female.Cast(zombie);
+			if (pbzF) pbzF.SetTargetPlayerID(playerID);
+		}
+		else
+		{
+			PBZ_Zombie_Male pbzM = PBZ_Zombie_Male.Cast(zombie);
+			if (pbzM) pbzM.SetTargetPlayerID(playerID);
+		}
 
 		int count = playerInventory.AttachmentCount();
 		int cargoCount;

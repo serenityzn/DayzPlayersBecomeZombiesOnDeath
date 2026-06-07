@@ -13,6 +13,15 @@ class PBZ_Config
 	// Delay in milliseconds before the zombie spawns after player death
 	int SpawnDelayMs = 5000;
 
+	// How often (ms) the zombie scans for its target player after they respawn
+	int RescanIntervalMs = 5000;
+
+	// How far ahead (meters) to place the noise waypoint toward the target player
+	float NoiseLeadDistance = 90.0;
+
+	// Print debug info to server console and logs
+	bool DebugEnabled = false;
+
 	static PBZ_Config GetInstance()
 	{
 		if ( !m_Instance )
