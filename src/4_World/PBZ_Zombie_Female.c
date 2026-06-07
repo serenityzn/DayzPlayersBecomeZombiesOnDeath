@@ -6,7 +6,7 @@ class PBZ_Zombie_Female : ZombieBase
 	void PBZ_Zombie_Female()
 	{
 		m_NoiseParams = new NoiseParams();
-		m_NoiseParams.LoadFromPath("CfgVehicles SurvivorBase NoiseShout");
+		m_NoiseParams.LoadFromPath("cfgAmmo Ammo_762x39 NoiseHit");
 	}
 
 	void SetTargetPlayerID(string id)
@@ -46,12 +46,14 @@ class PBZ_Zombie_Female : ZombieBase
 			dir.Normalize();
 
 			float dist      = vector.Distance(myPos, targetPos);
-			float leadDist  = Math.Min(cfg.NoiseLeadDistance, dist); // don't overshoot
+			float leadDist  = Math.Min(cfg.NoiseLeadDistance, dist);
 			vector noisePos = myPos + dir * leadDist;
 
-			float lifetime = cfg.RescanIntervalMs / 1000.0 + 1.0; // outlast the rescan interval
+			float lifetime = cfg.RescanIntervalMs / 1000.0 + 1.0;
 
-			GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 10.0);
+			// Place noise at lead point AND at player position for strong pull
+			GetGame().GetNoiseSystem().AddNoiseTarget(noisePos, lifetime, m_NoiseParams, 100.0);
+			GetGame().GetNoiseSystem().AddNoiseTarget(targetPos, lifetime, m_NoiseParams, 100.0);
 
 			if (cfg.DebugEnabled)
 			{
